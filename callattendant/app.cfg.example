@@ -242,15 +242,22 @@ MQTT_TOPIC_PREFIX = "callattendant"
 # Port is optional, default is 1883
 #MQTT_PORT = 1883
 # Username is optional, default is None
-#MQTT_USERNAME = None
-#MQTT_PASSWORD = None
+#MQTT_USERNAME = ""
+#MQTT_PASSWORD = ""
+
+# MQTT_NOTIFICATION_TYPE: The type of notification to send. Valid values are: EVENT, STATE
+# This setting controls the RETAIN attribute of MQTT messages.
+#   EVENT: Indicator topics are not retained
+#   STATE: Indicator topics are retained
+MQTT_INDICATOR_TYPE = "STATE"
+
 #MQTT_TIME_FORMAT: The format of the timestamp in the MQTT message. Valid values are: ISO, UNIX
 # ISO = "YYYY-MM-DD HH:MM:SS"
 # UNIX = Seconds since epoch (Usually: 1970-01-01 00:00:00)
 MQTT_TIME_FORMAT = "UNIX"
-#MQTT_CALLERID_FORMAT: The format of the callerid in the MQTT message. Valid values are: RAW, DISPLAY
-# DISPLAY uses the PHONE_DISPLAY_FORMAT to format the number
-# RAW uses the number from the provider
+# MQTT_CALLERID_FORMAT: The format of the callerid in the MQTT message. Valid values are: RAW, DISPLAY
+#   DISPLAY uses the PHONE_DISPLAY_FORMAT to format the number
+#   RAW uses the number from the provider
 MQTT_CALLERID_FORMAT = "RAW"
 
 # GPIO_LED_..._PIN: These values are the GPIO pin numbers attached to the LED indicators

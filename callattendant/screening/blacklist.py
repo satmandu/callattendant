@@ -156,6 +156,7 @@ class Blacklist(object):
         args = {"number": number}
         results = query_db(self.db, query, args, False)
         if len(results) > 0:
+            # Return tuple (Reason, Name)
             return True, (results[0][1], results[0][0])
         else:
             return False, None

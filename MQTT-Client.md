@@ -3,12 +3,12 @@
 Base-topic default is **callattendant**. Indicator names/subtopics are one of:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`RING, Approved, Blocked, Message, MessageCount`
 
-`LastCallerID` is a separate subtopic and does not have a hardware/GPIO equivalent indicator.
+`CallerID` is a separate subtopic and does not have a hardware/GPIO equivalent indicator.
 
 Examples:
 ```
 callattendant/Approved {"TimeStamp": 1714510621, "State": "BLINK", "Period": 700, "Count": 2}
-callattendant/LastCallerID {"TimeStamp": 1714512345, "Number": 6175551234, "Name": Unknown, "Action": "Screened", "Reason": "")
+callattendant/CallerID {"TimeStamp": 1714512345, "Number": 6175551234, "Name": Unknown, "Action": "Screened", "Reason": "")
 ```
 JSON formatted messages:
 
@@ -23,7 +23,7 @@ Callattendant MQTT message templates:
 - Count := Number of cycles (Period * Count)
 - State := ON, OFF, CLOSED, BLINK, PULSE or count of messages
 
-**LastCallerID**: {"TimeStamp": 0, "Number": "", "Name": "", "Action": "", "Reason": ""} 
+**CallerID**: {"TimeStamp": 0, "Number": "", "Name": "", "Action": "", "Reason": ""} 
 
 - Number may be raw/internal or formatted text.
 
@@ -37,4 +37,9 @@ MQTT_TIME_FORMAT = "UNIX"
 # DISPLAY uses the PHONE_DISPLAY_FORMAT to format the number
 # RAW uses the number from the provider
 MQTT_CALLERID_FORMAT = "RAW"
+# MQTT_NOTIFICATION_TYPE: The type of notification to send. Valid values are: EVENT, STATE
+# This setting controls the RETAIN attribute of MQTT messages.
+#   EVENT: Indicator topics are not retained
+#   STATE: Indicator topics are retained 
+MQTT_INDICATOR_TYPE = "STATE"
 ```

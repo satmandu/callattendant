@@ -52,6 +52,8 @@ class MQTTIndicatorClient(object):
             # Formatting options
             self.time_format = self.config['MQTT_TIME_FORMAT']
             self.callerid_format = self.config['MQTT_CALLERID_FORMAT']
+            # Retension option
+            self.retain = True if self.config['MQTT_INDICATOR_TYPE'] == 'STATE' else False
 
             # Create client root name
             self.topic_prefix = self.config['MQTT_TOPIC_PREFIX'] + "/"
@@ -102,7 +104,7 @@ class MQTTIndicatorClient(object):
         message['Count'] = count
         self.mqtt_queue.put_nowait((topic, json.dumps(message)))
 
-    def queue_callerid(self, topic, caller, action, reason):
+    def queue_callerid(self, topic, name, number, action, reason):
         """
         Queue a message to be published.
         """
@@ -111,14 +113,14 @@ class MQTTIndicatorClient(object):
         else:
             ts = int(time.time())
 
-        number = caller['NMBR']
+        displayNumber = number
         if (self.callerid_format == "DISPLAY"):
-            number = format_phone_no(number, self.config)
+            displayNumber = format_phone_no(number, self.config)
 
         message = {}
         message['TimeStamp'] = ts
-        message['Name'] = caller['NAME']
-        message['Number'] = number
+        message['Name'] = name
+        message['Number'] = displayNumber
         message['Action'] = action
         message['Reason'] = reason
         self.mqtt_queue.put_nowait((topic, json.dumps(message)))
@@ -138,7 +140,7 @@ class MQTTIndicatorClient(object):
         if self.username is not None:
             client.username_pw_set(self.username, self.password)
         client.connect(self.server, self.port)
-        client.publish(self.topic_prefix + topic, message, retain=True)
+        client.publish(self.topic_prefix + topic, message, retain=self.retain)
         client.disconnect()
 
 
@@ -251,13 +253,13 @@ class MQTTMessageCountIndicator(MQTTIndicator):
 
 class MQTTCallerIdIndicator(MQTTIndicator):
     """
-    The last caller ID indicator displays the last caller ID received.
+    The caller ID indicator displays the last caller ID received.
     """
     def __init__(self):
-        super().__init__('LastCallerID', None)
+        super().__init__('CallerID', None)
 
-    def display(self, caller, action="Screened", reason=""):
+    def display(self, name, number, action="Screened", reason=""):
         """
         Displays the last caller ID received.
         """
-        mqtt_client.queue_callerid(self.topic, caller, action, reason)
+        mqtt_client.queue_callerid(self.topic, name, number, action, reason)

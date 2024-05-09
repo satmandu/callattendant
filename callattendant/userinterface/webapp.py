@@ -285,7 +285,6 @@ def calls():
     """
 
     # Get GET request args, if available
-    number = request.args.get('number')
     search_text = request.args.get('search')
     search_type = request.args.get('submit')
 

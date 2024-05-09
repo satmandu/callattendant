@@ -174,6 +174,8 @@ class CallAttendant(object):
 
                 # An incoming call has occurred, log it
                 number = caller["NMBR"]
+                # Default to provider name
+                displayName = caller["NAME"]
                 print("Incoming call from {}".format(number))
 
                 # Vars used in the call screening
@@ -197,34 +199,38 @@ class CallAttendant(object):
                 if not caller_permitted and "whitelist" in screening_mode:
                     print("> Checking whitelist(s)")
                     is_whitelisted, result = self.screener.is_whitelisted(caller)
+                    # If true, result is a tuple (reason, name)
                     if is_whitelisted:
                         caller_permitted = True
                         action = "Permitted"
                         reason = result[0]
                         if result[1] is not None:
-                            caller["NAME"] = result[1]
+                            displayName = result[1]
                         self.approved_indicator.blink()
 
                 # Now check the blacklist if not preempted by whitelist
                 if not caller_permitted and "blacklist" in screening_mode:
                     print("> Checking blacklist(s)")
                     is_blacklisted, result = self.screener.is_blacklisted(caller)
+                    # If true, result is a tuple (reason, name)
                     if is_blacklisted:
                         caller_blocked = True
                         action = "Blocked"
                         reason = result[0]
                         if result[1] is not None:
-                            caller["NAME"] = result[1]
+                            displayName = result[1]
                         self.blocked_indicator.blink()
 
                 if not caller_permitted and not caller_blocked:
                     caller_screened = True
                     action = "Screened"
 
-                # Log every call to the database (and console)
+                # Log every call to the database, console and optionally MQTT
+                # Caller log has provider name and number
                 call_no = self.logger.log_caller(caller, action, reason)
                 if (self.callerid_indicator is not None):
-                    self.callerid_indicator.display(caller, action, reason)
+                    # Use displayName for the caller name if found in the whitelist or blacklist
+                    self.callerid_indicator.display(displayName, number, action, reason)
                 print("--> {} {}: {}".format(number, action, reason))
 
                 # Gather the data used to answer the call

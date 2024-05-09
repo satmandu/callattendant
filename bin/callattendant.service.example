@@ -1,11 +1,16 @@
 [Unit]
 Description=Call Attendant
 After=multi-user.target
+# May be necessary if using GPIO on Raspberry Pi
+#Requires=pigpiod.service
 
 [Service]
 Type=simple
-ExecStart=callattendant --config /home/pi/.callattendant/app.cfg
+StandardOutput=journal
+StandardError=inherit
+ExecStart=/home/pi/venv/bin/python -u /home/pi/venv/bin/callattendant --config /home/pi/.callattendant/app.cfg
 WorkingDirectory=/home/pi/.callattendant
+User=pi
 Restart=on-abort
 
 [Install]
